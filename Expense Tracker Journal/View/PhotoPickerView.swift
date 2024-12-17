@@ -9,49 +9,66 @@ import SwiftUI
 import PhotosUI
 import SwiftData
 
-struct PhotoPickerView: View {
-    @State private var selectedImage: UIImage? = nil // Per mostrare l'immagine nella View
-    @State private var selectedItem: PhotosPickerItem? = nil // Gestisce l'immagine selezionata
+struct PhotoJournalView: View {
+    @Environment(\.modelContext) private var context
+    @Query private var photoEntities: [PhotoEntity] // Fetch delle foto dal database
+    
+    @State private var selectedItems: [PhotosPickerItem] = [] // Foto selezionate
+    @State private var selectedImages: [UIImage] = []         // Immagini visualizzate
     
     var body: some View {
-        NavigationStack{
-            VStack(spacing: 20) {
-                if let image = selectedImage {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxHeight: 300)
-                        .cornerRadius(12)
-                } else {
-                    Text("Seleziona un'immagine")
-                    Image(systemName: "photo")
-                        .font(.headline)
-                        .foregroundStyle(.gray)
-                        .padding()
+        NavigationStack {
+            VStack {
+                // ScrollView per mostrare le foto salvate
+                ScrollView {
+                    LazyVStack(spacing: 15) {
+                        ForEach(photoEntities, id: \.id) { entity in
+                            if let uiImage = UIImage(data: entity.imageData) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .frame(height: 200)
+                                    .cornerRadius(12)
+                                    .shadow(radius: 5)
+                            }
+                        }
+                    }
                 }
                 
-                //bottone per caricare una foto direttamente dalla libreria
-                PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
-                    Label("Select Photo of Your Product",systemImage: "photo.on.rectangle.angled")
+                // Bottone PhotosPicker
+                PhotosPicker(
+                    selection: $selectedItems,
+                    maxSelectionCount: 10, // Numero massimo di foto selezionabili
+                    matching: .images
+                ) {
+                    Label("Add a Photo 😊", systemImage: "photo.on.rectangle.angled")
                         .font(.title2)
-                        .frame(maxWidth: .infinity)
                         .padding()
-                        .foregroundStyle(.blue)
-                        .clipped()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
                 }
-                .padding(.horizontal)
+                .onChange(of: selectedItems) { oldItems, newItems in
+                    saveSelectedImages(newItems)
+                }
             }
-            .onChange(of: selectedItem) { oldItem, newItem in
-                Task {
-                    if let data = try? await newItem?.loadTransferable(type: Data.self),
-                       let uiImage = UIImage(data: data) {
-                        selectedImage = uiImage // Aggiorna l'immagine selezionata
-                    }
+            .navigationTitle("Bought Products")
+            .padding()
+        }
+    }
+    
+    // Funzione per salvare le immagini selezionate in SwiftData
+    func saveSelectedImages(_ items: [PhotosPickerItem]) {
+        for item in items {
+            Task {
+                if let data = try? await item.loadTransferable(type: Data.self) {
+                    let newPhoto = PhotoEntity(imageData: data)
+                    context.insert(newPhoto) // Salva nel database
                 }
             }
         }
     }
 }
+
         #Preview {
-            PhotoPickerView()
+            PhotoJournalView()
         }

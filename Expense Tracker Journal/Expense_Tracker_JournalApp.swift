@@ -13,6 +13,6 @@ struct Expense_Tracker_JournalApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: [Expense.self, Category.self])
+        .modelContainer(for: [Expense.self, Category.self, PhotoEntity.self])
     }
 }

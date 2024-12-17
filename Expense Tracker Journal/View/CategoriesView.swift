@@ -28,7 +28,7 @@ struct CategoriesView: View {
                                 Label("No Expenses", systemImage: "tray.fill")
                             }
                         }
-                    } label: {
+                           } label: {
                         Text(category.categoryName)
                     }
                 }
@@ -50,6 +50,7 @@ struct CategoriesView: View {
                         Image(systemName: "plus.circle.fill")
                             .font(.title3)
                     }
+                    .accessibilityLabel("Add a category")
                 }
             }
             .sheet(isPresented: $addCategory) {

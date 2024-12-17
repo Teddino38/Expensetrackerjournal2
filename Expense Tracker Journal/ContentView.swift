@@ -17,6 +17,8 @@ struct ContentView: View {
                     Image(systemName: "creditcard.fill")
                     Text ("Expenses")
                 }
+                .accessibilityLabel("Expenses Tab")
+                .accessibilityHint("Analize All Your Expenses")
             
             CategoriesView()
                 .tag("Categories")
@@ -24,12 +26,17 @@ struct ContentView: View {
                     Image(systemName: "list.clipboard.fill")
                     Text ("Categories")
                 }
-            PhotoPickerView()
+                .accessibilityLabel("Categories Tab")
+                .accessibilityHint("Analaize all the categories of your expenses")
+            
+            PhotoJournalView()
                 .tag("Album")
                 .tabItem{
                     Image(systemName: "photo")
                     Text("Album")
                 }
+                .accessibilityLabel("Photo Tab")
+                .accessibilityHint("Share photos of Your Expenses")
             }
         }
     }
