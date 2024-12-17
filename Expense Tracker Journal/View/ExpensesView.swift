@@ -9,11 +9,11 @@ import SwiftUI
 import SwiftData
 
 struct ExpensesView: View {
+    //proprietà delle spese raggruppate
     @Query(sort: [
         SortDescriptor(\Expense.date, order: .reverse)
     ], animation: .snappy) private var allExpenses: [Expense]
     @Environment(\.modelContext) private var context
-    ///SPESE RAGGRUPPATE
     @State private var groupedExpenses: [GroupedExpenses] = []
     @State private var addExpenses: Bool = false
     var body: some View {
@@ -24,8 +24,12 @@ struct ExpensesView: View {
                         ForEach(group.expenses) { expense in
                             ExpenseCardView(expense: expense)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    //Delete BUTTON:
-                        
+                                    //delete button
+                                    Button(role: .destructive){
+                                        deleteExpense(expense)
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
                                 }
                         }
                     }
@@ -39,7 +43,7 @@ struct ExpensesView: View {
                     }
                 }
             }
-            // Come aggiungere nuove categorie
+            // Come aggiungere nuove spese
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
                     Button {
@@ -56,7 +60,9 @@ struct ExpensesView: View {
                 createGroupedExpenses(newValue)
             }
         }
-        .sheet(isPresented: $addExpenses) { AddExpenseView()
+        .sheet(isPresented: $addExpenses) {
+            AddExpenseView()
+                .interactiveDismissDisabled()
         }
     }
     // Spese divise in base alla data
@@ -72,7 +78,7 @@ struct ExpensesView: View {
                 let calendar = Calendar.current
                 let date1 = calendar.date(from: $0.key) ?? .init()
                 let date2 = calendar.date(from: $1.key) ?? .init()
-
+                
                 return calendar.compare(date1, to: date2, toGranularity: .day) == .orderedDescending
             }
             //Aggiunta all'array delle spese
@@ -83,6 +89,14 @@ struct ExpensesView: View {
                                  , expenses: dict.value)
                 })
             }
+        }
+    }
+    func deleteExpense(_ expense: Expense) {
+        context.delete(expense)
+        do {
+            try context.save() // Salva le modifiche al database
+        } catch {
+            print("Errore durante l'eliminazione dell'expense: \(error)")
         }
     }
 }

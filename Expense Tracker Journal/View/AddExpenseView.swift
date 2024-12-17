@@ -44,19 +44,29 @@ struct AddExpenseView: View {
                         
                         Spacer()
                         
-                        Picker("", selection: $category) {
-                            ForEach(allCategories) {
-                                Text($0.categoryName)
-                                    .tag($0)
+                        Menu {
+                            ForEach(allCategories) { category in
+                                Button(category.categoryName) {
+                                    self.category = category
+                                }
+                            }
+                            // None button
+                            Button ("None") {
+                                category = nil
+                            }
+                        } label: {
+                            if let categoryName = category?.categoryName {
+                                Text(categoryName)
+                            } else {
+                                Text("None")
                             }
                         }
-                        .pickerStyle(.menu)
-                        .labelsHidden()
                     }
                 }
 
             }
             .navigationTitle("Add Expense")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 //questa toolbar aggiung un "cancel" e un "add" button
                 ToolbarItem(placement: .topBarLeading) {

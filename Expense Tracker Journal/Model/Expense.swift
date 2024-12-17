@@ -9,12 +9,13 @@ import SwiftUI
 import SwiftData
 
 @Model
-class Expense{
+class Expense: Identifiable {
     var title : String
     var subTitle : String
     var amount: Double
     var date: Date
     var category: Category?
+    
     
     init(title: String, subTitle: String, amount: Double, date: Date, category: Category? = nil) {
         self.title = title
