@@ -32,6 +32,7 @@ struct CategoriesView: View {
                         Text(category.categoryName)
                     }
                 }
+                .onDelete(perform: deleteCategory)
             }
             .navigationTitle("Categories")
             .overlay {
@@ -92,6 +93,18 @@ struct CategoriesView: View {
             }
         }
     }
+    // funzione per eliminare una categoria
+        private func deleteCategory(at offsets: IndexSet) {
+            for index in offsets {
+                let category = allCategories[index]
+                context.delete(category)
+            }
+            do {
+                try context.save()
+            } catch {
+                print("Errore durante l'eliminazione della categoria: \(error.localizedDescription)")
+            }
+        }
 }
 #Preview {
     CategoriesView()

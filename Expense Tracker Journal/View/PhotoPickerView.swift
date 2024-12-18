@@ -29,6 +29,13 @@ struct PhotoJournalView: View {
                                     .frame(height: 200)
                                     .cornerRadius(12)
                                     .shadow(radius: 5)
+                                    .swipeActions(edge: .trailing) {
+                                        Button(role: .destructive) {
+                                            deleteImage(entity: entity)
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                    }
                             }
                         }
                     }
@@ -40,7 +47,7 @@ struct PhotoJournalView: View {
                     maxSelectionCount: 10, // Numero massimo di foto selezionabili
                     matching: .images
                 ) {
-                    Label("Add a Photo 😊", systemImage: "photo.on.rectangle.angled")
+                    Label("Add a Photo", systemImage: "photo.on.rectangle.angled")
                         .font(.title2)
                         .padding()
                         .background(Color.blue)
@@ -67,8 +74,13 @@ struct PhotoJournalView: View {
             }
         }
     }
+    // Funzione per eliminare un'immagine
+    func deleteImage(entity: PhotoEntity) {
+        context.delete(entity)
+        try? context.save()
+    }
 }
 
-        #Preview {
-            PhotoJournalView()
-        }
+#Preview {
+    PhotoJournalView()
+}
